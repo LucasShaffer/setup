@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+COUNT=0
+
+for file in $(git status -uno --short | sed s/^...//); do
+  git add $file;
+  git commit --fixup $(git log -n 1 --format=format:%H --relative='PATH' $file) && COUNT=$((COUNT+1));
+done
+
+if (($COUNT == 1)); then
+  echo -e "\nCreated ${COUNT} commit"
+fi
+
+if (($COUNT > 1)); then
+  echo -e "\nCreated ${COUNT} commits"
+fi
+
+if (($COUNT > 0)); then
+  echo -e '\nReady for autosquash:'
+  echo '    git rebase --interactive --autosquash master'
+fi
